@@ -3,236 +3,681 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NoName | Cargando</title>
+  <title>NoName | Pantalla de carga</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #c9a45b;
+      --gold-soft: #ead8a7;
+      --violet: #6f35c6;
+      --violet-deep: #1b102c;
+      --lilac: #a98cf0;
+      --gem-blue: #5f8ee8;
+      --ink: #050409;
+      --panel: rgba(8, 6, 14, .58);
+      --line: rgba(217, 177, 95, .28);
+      --progress: 0%;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--ink);
+    }
 
     body {
-      min-height: 100vh;
+      color: var(--gold-soft);
+      font-family: Georgia, "Times New Roman", serif;
+      isolation: isolate;
+    }
+
+    #magicCanvas,
+    .world,
+    .vignette,
+    .frame {
+      position: fixed;
+      inset: 0;
+    }
+
+    #magicCanvas {
+      z-index: 1;
+    }
+
+    .world {
+      z-index: 0;
+      background:
+        radial-gradient(ellipse at 50% 40%, rgba(111, 53, 198, .24), transparent 34%),
+        radial-gradient(ellipse at 22% 18%, rgba(95, 142, 232, .08), transparent 22%),
+        radial-gradient(ellipse at 78% 72%, rgba(201, 164, 91, .11), transparent 27%),
+        linear-gradient(125deg, #020203 0%, #0b0810 35%, #1b102c 66%, #050307 100%);
       overflow: hidden;
-      font-family: Georgia, 'Times New Roman', serif;
-      color: #f7e7b4;
-      background:
-        radial-gradient(circle at 20% 25%, rgba(148, 55, 255, .55), transparent 30%),
-        radial-gradient(circle at 80% 10%, rgba(218, 165, 32, .22), transparent 25%),
-        linear-gradient(135deg, #12051f 0%, #27103c 45%, #09040f 100%);
     }
 
-    .mist, .stars, .spell-ring, .gold-sparks { position: fixed; inset: 0; pointer-events: none; }
-
-    .mist {
-      background:
-        radial-gradient(circle at 15% 80%, rgba(140, 55, 255, .28), transparent 35%),
-        radial-gradient(circle at 70% 70%, rgba(92, 32, 160, .35), transparent 32%);
-      filter: blur(8px);
-      animation: mistMove 12s ease-in-out infinite alternate;
-    }
-
-    .stars {
-      background-image:
-        radial-gradient(#fff 1px, transparent 1px),
-        radial-gradient(#d6a94a 1px, transparent 1px);
-      background-size: 90px 90px, 140px 140px;
-      opacity: .45;
-      animation: twinkle 4s linear infinite;
-    }
-
-    .spell-ring {
-      width: 720px;
-      height: 720px;
-      border: 1px solid rgba(211, 166, 74, .35);
-      border-radius: 50%;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 55px rgba(135, 54, 255, .45), inset 0 0 45px rgba(213, 165, 55, .12);
-      animation: rotate 18s linear infinite;
-    }
-
-    .spell-ring::before,
-    .spell-ring::after {
-      content: "✦ ✧ ✺ ✧ ✦ ✧ ✺ ✧ ✦";
+    .world::before {
+      content: "";
       position: absolute;
-      inset: 42px;
-      border: 1px dashed rgba(246, 214, 141, .28);
+      inset: -10vmax;
+      background:
+        linear-gradient(115deg, transparent 0 42%, rgba(201, 164, 91, .055) 42.2% 42.6%, transparent 42.8% 100%),
+        linear-gradient(65deg, transparent 0 55%, rgba(169, 140, 240, .045) 55.1% 55.5%, transparent 55.8% 100%),
+        conic-gradient(from 38deg at 50% 44%, transparent 0 13%, rgba(201, 164, 91, .045) 13.4% 13.9%, transparent 14.4% 34%, rgba(95, 142, 232, .035) 34.4% 34.8%, transparent 35.3% 100%);
+      filter: blur(.15px);
+      opacity: .50;
+      animation: rotateWorld 96s linear infinite;
+    }
+
+    .world::after {
+      content: "";
+      position: absolute;
+      width: min(112vmin, 980px);
+      height: min(66vmin, 560px);
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
       border-radius: 50%;
-      display: grid;
-      place-items: start center;
-      font-size: 28px;
-      letter-spacing: 18px;
-      color: rgba(246, 214, 141, .65);
+      background:
+        radial-gradient(ellipse, transparent 53%, rgba(201, 164, 91, .20) 54% 54.4%, transparent 55.2%),
+        radial-gradient(ellipse, transparent 61%, rgba(169, 140, 240, .12) 62% 62.4%, transparent 63.2%),
+        linear-gradient(90deg, transparent 0 18%, rgba(201, 164, 91, .075) 18.2% 18.4%, transparent 18.8% 81%, rgba(201, 164, 91, .075) 81.2% 81.4%, transparent 81.8% 100%);
+      box-shadow:
+        0 0 58px rgba(111, 53, 198, .24),
+        inset 0 0 80px rgba(169, 140, 240, .04);
+      opacity: .86;
+      animation: portalPulse 11s ease-in-out infinite;
     }
 
-    .spell-ring::after {
-      inset: 110px;
-      animation: rotateReverse 12s linear infinite;
-      color: rgba(174, 91, 255, .75);
-    }
-
-    .container {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px;
+    .vignette {
       z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 42%, transparent 0 42%, rgba(0, 0, 0, .34) 70%, rgba(0, 0, 0, .82) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, .52), transparent 22%, rgba(0, 0, 0, .66));
     }
 
-    .crest {
-      width: 86px;
-      height: 86px;
-      margin-bottom: 24px;
-      border: 2px solid rgba(230, 181, 76, .8);
-      transform: rotate(45deg);
+    .frame {
+      z-index: 5;
+      pointer-events: none;
+      border: 1px solid rgba(201, 164, 91, .32);
+      margin: 18px;
+      box-shadow:
+        inset 0 0 24px rgba(201, 164, 91, .08),
+        0 0 28px rgba(111, 53, 198, .14);
+    }
+
+    .frame::before,
+    .frame::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      width: min(38vw, 420px);
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, rgba(234, 216, 167, .72), transparent);
+    }
+
+    .frame::before { top: -1px; }
+    .frame::after { bottom: -1px; }
+
+    .layout {
+      position: relative;
+      z-index: 3;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      padding: clamp(28px, 5vw, 70px);
+    }
+
+    .hero {
       display: grid;
       place-items: center;
-      box-shadow: 0 0 30px rgba(218, 165, 32, .3);
-      background: rgba(20, 5, 35, .42);
+      text-align: center;
     }
 
-    .crest span {
-      transform: rotate(-45deg);
-      font-size: 46px;
-      font-weight: bold;
-      color: #f4d783;
-      text-shadow: 0 0 18px rgba(255, 218, 108, .75);
+    .brand {
+      width: min(100%, 920px);
+      display: grid;
+      justify-items: center;
+    }
+
+    .sigil {
+      position: relative;
+      width: clamp(190px, 26vmin, 310px);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin: 0 auto clamp(8px, 1.6vh, 18px);
+      filter:
+        drop-shadow(0 18px 34px rgba(0, 0, 0, .58))
+        drop-shadow(0 0 16px rgba(111, 53, 198, .18));
+    }
+
+    .sigil::before,
+    .sigil::after,
+    .sigil-ring {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .sigil::before {
+      inset: auto;
+    }
+
+    .sigil::after {
+      inset: auto;
+    }
+
+    .sigil-core {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .sigil-core img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      filter:
+        drop-shadow(0 0 10px rgba(111, 53, 198, .28))
+        drop-shadow(0 0 7px rgba(201, 164, 91, .18));
     }
 
     h1 {
-      font-size: clamp(70px, 11vw, 150px);
+      font-size: clamp(62px, 11vw, 158px);
+      line-height: .86;
       font-weight: 400;
-      letter-spacing: 3px;
-      background: linear-gradient(180deg, #fff1b8, #d9a441 48%, #865d19);
+      letter-spacing: 0;
+      background:
+        linear-gradient(180deg, #fff0bf 0%, #c9a45b 36%, #74511f 62%, #edd9a2 100%);
       -webkit-background-clip: text;
+      background-clip: text;
       color: transparent;
-      text-shadow: 0 0 35px rgba(208, 142, 255, .42);
+      -webkit-text-stroke: 1px rgba(64, 39, 20, .58);
+      text-shadow:
+        0 1px 0 rgba(255, 244, 199, .38),
+        0 9px 22px rgba(0, 0, 0, .62),
+        0 0 26px rgba(111, 53, 198, .22);
+      filter: drop-shadow(0 0 14px rgba(201, 164, 91, .16));
     }
 
     .subtitle {
-      margin-top: 10px;
-      font-size: 18px;
-      letter-spacing: 8px;
+      margin-top: 18px;
+      color: rgba(234, 215, 161, .76);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: clamp(12px, 1.6vw, 16px);
+      letter-spacing: .36em;
       text-transform: uppercase;
-      color: rgba(246, 214, 141, .78);
+      text-shadow: 0 0 14px rgba(111, 53, 198, .22);
     }
 
-    .loader {
-      width: min(620px, 82vw);
-      height: 22px;
-      margin-top: 58px;
-      border: 1px solid rgba(245, 201, 91, .75);
+    .download {
+      width: min(980px, 100%);
+      justify-self: center;
+      display: grid;
+      gap: 14px;
+      padding-bottom: clamp(4px, 2vh, 24px);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .download-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      color: rgba(234, 216, 167, .84);
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 12px;
+    }
+
+    .status {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .percent {
+      color: #f0daa0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-shadow: 0 0 14px rgba(201, 164, 91, .38);
+    }
+
+    .bar-shell {
+      position: relative;
+      height: 20px;
+      border: 1px solid rgba(201, 164, 91, .48);
       border-radius: 999px;
       padding: 3px;
-      background: rgba(12, 3, 20, .72);
-      box-shadow: 0 0 26px rgba(156, 75, 255, .45), inset 0 0 16px rgba(0,0,0,.65);
+      background: rgba(3, 2, 8, .72);
+      box-shadow:
+        0 0 24px rgba(111, 53, 198, .24),
+        inset 0 0 18px rgba(0, 0, 0, .85);
+      overflow: hidden;
+    }
+
+    .bar-shell::before {
+      content: "";
+      position: absolute;
+      inset: -45% 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .16), transparent);
+      transform: translateX(calc(var(--progress) - 55%));
+      transition: transform .45s ease;
     }
 
     .bar {
+      position: relative;
       height: 100%;
-      width: 0%;
+      width: var(--progress);
+      min-width: 8px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #6c1fb8, #c261ff, #f0c45e);
-      box-shadow: 0 0 22px rgba(191, 94, 255, .9);
-      animation: loading 8s ease-in-out infinite;
+      background:
+        linear-gradient(90deg, #2f1955 0%, #6f35c6 45%, #a98cf0 72%, #c9a45b 100%);
+      box-shadow:
+        0 0 15px rgba(169, 140, 240, .34),
+        0 0 22px rgba(201, 164, 91, .20);
+      transition: width .55s cubic-bezier(.22, 1, .36, 1);
     }
 
-    .loading-text {
-      margin-top: 18px;
-      font-size: 16px;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: rgba(255, 236, 180, .85);
-    }
-
-    .footer {
-      position: fixed;
-      bottom: 28px;
-      width: 100%;
-      text-align: center;
-      font-family: Arial, sans-serif;
-      letter-spacing: 4px;
-      font-size: 12px;
-      color: rgba(255, 220, 148, .62);
-      z-index: 2;
-    }
-
-    .spark {
-      position: fixed;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #f1c85b;
-      box-shadow: 0 0 12px #f1c85b;
-      animation: floatSpark linear infinite;
-      pointer-events: none;
-    }
-
-    .border {
-      position: fixed;
-      inset: 18px;
-      border: 1px solid rgba(220, 164, 62, .55);
-      box-shadow: inset 0 0 18px rgba(220, 164, 62, .18);
-      pointer-events: none;
-      z-index: 3;
-    }
-
-    .border::before, .border::after {
-      content: "✦";
+    .bar::after {
+      content: "";
       position: absolute;
-      color: #e0ad4e;
-      font-size: 24px;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: 0;
+      border-radius: inherit;
+      background: repeating-linear-gradient(110deg, transparent 0 16px, rgba(255, 255, 255, .20) 17px 19px, transparent 20px 32px);
+      animation: shimmer 1.8s linear infinite;
+      opacity: .68;
     }
-    .border::before { top: -14px; }
-    .border::after { bottom: -14px; }
 
-    @keyframes loading {
-      0% { width: 8%; }
-      50% { width: 78%; }
-      100% { width: 98%; }
+    .download-bottom {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      color: rgba(234, 216, 167, .62);
+      font-size: 12px;
+      letter-spacing: .06em;
     }
-    @keyframes rotate { to { transform: translate(-50%, -50%) rotate(360deg); } }
-    @keyframes rotateReverse { to { transform: rotate(-360deg); } }
-    @keyframes mistMove { to { transform: scale(1.1) translate(25px, -20px); } }
-    @keyframes twinkle { 50% { opacity: .75; transform: scale(1.02); } }
-    @keyframes floatSpark {
-      from { transform: translateY(110vh) scale(.5); opacity: 0; }
-      15% { opacity: 1; }
-      to { transform: translateY(-10vh) scale(1.3); opacity: 0; }
+
+    .file {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .server {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      white-space: nowrap;
+    }
+
+    .pill {
+      border: 1px solid rgba(201, 164, 91, .24);
+      background: var(--panel);
+      padding: 7px 10px;
+      color: rgba(234, 216, 167, .70);
+    }
+
+    .runes {
+      position: fixed;
+      z-index: 2;
+      inset: auto 0 18vh;
+      display: flex;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 42px);
+      color: rgba(201, 164, 91, .10);
+      font-size: clamp(28px, 5vw, 68px);
+      pointer-events: none;
+      transform: translateY(40%);
+      animation: riseRunes 7s ease-in-out infinite;
+    }
+
+    .runes span {
+      animation: runeGlow 3.2s ease-in-out infinite;
+    }
+
+    .runes span:nth-child(2n) {
+      color: rgba(169, 140, 240, .12);
+      animation-delay: -1.2s;
+    }
+
+    @media (max-width: 720px) {
+      .layout {
+        padding: 28px 22px;
+      }
+
+      .download-top,
+      .download-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .percent,
+      .server {
+        justify-self: start;
+      }
+
+      .subtitle {
+        letter-spacing: .24em;
+      }
+
+      .frame {
+        margin: 10px;
+      }
+    }
+
+    @keyframes rotateWorld {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes portalPulse {
+      0%, 100% {
+        opacity: .72;
+        filter: blur(0);
+        transform: translate(-50%, -50%) scale(.98);
+      }
+      50% {
+        opacity: 1;
+        filter: blur(.8px);
+        transform: translate(-50%, -50%) scale(1.03);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinReverse {
+      to { transform: rotate(-315deg); }
+    }
+
+    @keyframes shimmer {
+      to { background-position: 90px 0; }
+    }
+
+    @keyframes riseRunes {
+      0%, 100% { opacity: .2; transform: translateY(40%) scale(.98); }
+      50% { opacity: .65; transform: translateY(0) scale(1.02); }
+    }
+
+    @keyframes runeGlow {
+      50% { text-shadow: 0 0 22px currentColor; }
     }
   </style>
 </head>
 <body>
-  <div class="mist"></div>
-  <div class="stars"></div>
-  <div class="spell-ring"></div>
-  <div class="border"></div>
+  <div class="world" aria-hidden="true"></div>
+  <canvas id="magicCanvas" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="frame" aria-hidden="true"></div>
+  <div class="runes" aria-hidden="true">
+    <span>✦</span><span>✧</span><span>✶</span><span>✷</span><span>✦</span>
+  </div>
 
-  <main class="container">
-    <div class="crest"><span>N</span></div>
-    <h1>NoName</h1>
-    <div class="subtitle">Roleplay mágico</div>
-    <div class="loader"><div class="bar"></div></div>
-    <div class="loading-text">Cargando hechizos...</div>
+  <main class="layout">
+    <section class="hero" aria-label="NoName Roleplay de Hogwarts">
+      <div class="brand">
+        <div class="sigil">
+          <div class="sigil-ring"></div>
+          <div class="sigil-core">
+            <img src="assets/NoName_Magico.png" alt="Emblema NoName" />
+          </div>
+        </div>
+        <h1>NoName</h1>
+        <p class="subtitle">Roleplay de Hogwarts</p>
+      </div>
+    </section>
+
+    <section class="download" aria-label="Progreso de descarga">
+      <div class="download-top">
+        <div class="status" id="statusText">Conectando con el servidor...</div>
+        <div class="percent" id="percentText">0%</div>
+      </div>
+      <div class="bar-shell">
+        <div class="bar" id="progressBar"></div>
+      </div>
+      <div class="download-bottom">
+        <div class="file" id="fileText">Esperando archivos de FastDL</div>
+        <div class="server">
+          <span class="pill" id="mapText">Mapa: preparando</span>
+          <span class="pill">PHYSGUN</span>
+          <span class="pill">GARRY'S MOD</span>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <div class="footer">POWERED BY PHYSGUN · GARRY'S MOD</div>
-
   <script>
-    const totalSparks = 42;
-    for (let i = 0; i < totalSparks; i++) {
-      const spark = document.createElement('div');
-      spark.className = 'spark';
-      spark.style.left = Math.random() * 100 + 'vw';
-      spark.style.animationDuration = (5 + Math.random() * 8) + 's';
-      spark.style.animationDelay = (-Math.random() * 10) + 's';
-      spark.style.opacity = Math.random();
-      document.body.appendChild(spark);
+    const state = {
+      totalFiles: 0,
+      filesNeeded: 0,
+      progress: 0,
+      hasRealProgress: false,
+      currentFile: "Esperando archivos de FastDL",
+      status: "Conectando con el servidor...",
+      map: "preparando",
+      serverName: "NoName"
+    };
+
+    const root = document.documentElement;
+    const statusText = document.getElementById("statusText");
+    const percentText = document.getElementById("percentText");
+    const fileText = document.getElementById("fileText");
+    const mapText = document.getElementById("mapText");
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
     }
+
+    function renderProgress() {
+      const progress = clamp(state.progress, 0, 100);
+      root.style.setProperty("--progress", progress.toFixed(2) + "%");
+      percentText.textContent = Math.round(progress) + "%";
+      statusText.textContent = state.status;
+      fileText.textContent = state.currentFile;
+      mapText.textContent = "Mapa: " + state.map;
+    }
+
+    function updateFromFiles() {
+      if (state.totalFiles > 0) {
+        const downloaded = state.totalFiles - state.filesNeeded;
+        state.progress = clamp((downloaded / state.totalFiles) * 100, 0, 100);
+        state.status = state.filesNeeded > 0
+          ? "Descargando contenido FastDL"
+          : "Contenido descargado. Entrando a Hogwarts";
+      }
+      renderProgress();
+    }
+
+    window.SetFilesTotal = function(total) {
+      state.totalFiles = Number(total) || 0;
+      state.hasRealProgress = state.totalFiles > 0;
+      updateFromFiles();
+    };
+
+    window.SetFilesNeeded = function(needed) {
+      state.filesNeeded = Number(needed) || 0;
+      state.hasRealProgress = state.totalFiles > 0;
+      updateFromFiles();
+    };
+
+    window.DownloadingFile = function(fileName) {
+      state.currentFile = fileName ? "Descargando: " + fileName : "Preparando archivo...";
+      renderProgress();
+    };
+
+    window.SetStatusChanged = function(status) {
+      if (status) {
+        state.status = status;
+        renderProgress();
+      }
+    };
+
+    window.GameDetails = function(serverName, serverUrl, mapName) {
+      if (serverName) state.serverName = serverName;
+      if (mapName) state.map = mapName;
+      renderProgress();
+    };
+
+    let fakeProgress = 0;
+    const fallback = window.setInterval(function() {
+      if (state.hasRealProgress) {
+        window.clearInterval(fallback);
+        return;
+      }
+
+      fakeProgress = Math.min(92, fakeProgress + Math.random() * 1.45);
+      state.progress = fakeProgress;
+      state.status = "Preparando workshop, FastDL y addons";
+      renderProgress();
+    }, 850);
+
+    renderProgress();
+
+    const canvas = document.getElementById("magicCanvas");
+    const ctx = canvas.getContext("2d");
+    const particles = [];
+    const trails = [];
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let tick = 0;
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function spawnParticle(forceCenter) {
+      const centerX = width * .5;
+      const centerY = height * .46;
+      const angle = Math.random() * Math.PI * 2;
+      const radius = forceCenter ? Math.random() * 92 : 190 + Math.random() * Math.max(width, height) * .42;
+      const speed = .08 + Math.random() * .38;
+      const hue = Math.random() > .88 ? 218 + Math.random() * 12 : 262 + Math.random() * 18;
+
+      particles.push({
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
+        vx: Math.cos(angle + Math.PI / 2) * speed,
+        vy: Math.sin(angle + Math.PI / 2) * speed,
+        pull: .0007 + Math.random() * .0014,
+        size: .7 + Math.random() * 2,
+        life: 170 + Math.random() * 250,
+        maxLife: 310,
+        hue
+      });
+    }
+
+    function spawnTrail() {
+      const fromLeft = Math.random() > .5;
+      trails.push({
+        x: fromLeft ? -80 : width + 80,
+        y: height * (.18 + Math.random() * .58),
+        vx: (fromLeft ? 1 : -1) * (1.8 + Math.random() * 2.4),
+        vy: -.5 + Math.random() * 1,
+        life: 46 + Math.random() * 28,
+        hue: Math.random() > .82 ? 218 + Math.random() * 12 : 264 + Math.random() * 18
+      });
+    }
+
+    function drawStar(x, y, r, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x - r, y);
+      ctx.lineTo(x + r, y);
+      ctx.moveTo(x, y - r);
+      ctx.lineTo(x, y + r);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function animate() {
+      tick++;
+      ctx.clearRect(0, 0, width, height);
+      ctx.globalCompositeOperation = "lighter";
+
+      if (tick % 3 === 0) spawnParticle(false);
+      if (tick % 92 === 0) spawnTrail();
+
+      const centerX = width * .5;
+      const centerY = height * .46;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        const dx = centerX - p.x;
+        const dy = centerY - p.y;
+        p.vx += dx * p.pull;
+        p.vy += dy * p.pull;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+
+        const alpha = clamp(p.life / p.maxLife, 0, 1);
+        const color = "hsla(" + p.hue + ", 76%, 72%, " + (alpha * .62) + ")";
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (Math.random() > .996) drawStar(p.x, p.y, p.size * 3.2, color, alpha * .7);
+        if (p.life <= 0 || Math.hypot(dx, dy) < 18) particles.splice(i, 1);
+      }
+
+      for (let i = trails.length - 1; i >= 0; i--) {
+        const t = trails[i];
+        t.x += t.vx;
+        t.y += t.vy;
+        t.life--;
+
+        const grad = ctx.createLinearGradient(t.x - t.vx * 10, t.y - t.vy * 10, t.x, t.y);
+        grad.addColorStop(0, "hsla(" + t.hue + ", 90%, 65%, 0)");
+        grad.addColorStop(1, "hsla(" + t.hue + ", 82%, 78%, .42)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4;
+        ctx.shadowColor = "hsla(" + t.hue + ", 82%, 78%, .46)";
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(t.x - t.vx * 12, t.y - t.vy * 12);
+        ctx.lineTo(t.x, t.y);
+        ctx.stroke();
+
+        if (t.life <= 0) trails.splice(i, 1);
+      }
+
+      ctx.globalCompositeOperation = "source-over";
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    for (let i = 0; i < 44; i++) spawnParticle(true);
+    animate();
   </script>
 </body>
 </html>
